@@ -1,1 +1,0 @@
-SELECT * FROM weather.api_weather_data ;
