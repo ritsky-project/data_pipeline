@@ -8,7 +8,7 @@ An end-to-end ELT pipeline that ingests live data from a REST API, loads raw rec
 
 ## Architecture
 
-![Architecture Diagram](/workspaces/data_pipeline/images/image.png)
+![Architecture Diagram](https://github.com/ritsky-project/data_pipeline/blob/main/images/image.png)
 
 ```
 REST API
