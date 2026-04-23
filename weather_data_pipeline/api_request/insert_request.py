@@ -47,5 +47,3 @@ def create_table(conn):
 
 conn = connect_to_db()
 create_table(conn)
-
-# python weather_data_pipeline/api_request/insert_request.py
