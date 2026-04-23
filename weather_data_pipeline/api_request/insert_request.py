@@ -39,7 +39,6 @@ def create_table(conn):
         )
 
         conn.commit()
-        cursor.close()
         print("Table was created successfully")
 
     except psycopg2.Error as e:
@@ -47,42 +46,58 @@ def create_table(conn):
         print(f"Failed to create table: {e}")
         raise
 
-conn = connect_to_db()
-create_table(conn)
-
-def insert_record(conn, data) :
+def insert_record(conn, data):
     print("Insert Weather Data into database")
 
-    try :
+    try:
         weather  = data['current']
-        location = data['current']
+        location = data['location']
         cursor   = conn.cursor()
+
         cursor.execute(
             """
             INSERT INTO weather.api_weather_data(
                 city,
-                temprature,
+                temperature,
                 weather_description,
                 wind_speed,
+                humidity,
                 time,
-                inserted_at,
+                inserted_date,
                 utc_offset
-            )VALUES(%s, %s, %s, %s, %s ,NOW(), %s)
+            ) VALUES (%s, %s, %s, %s, %s, %s, NOW(), %s)
             """,
             (
-                location['name'],
-                weather['temprature'],
-                weather['weather_description'][0],
+                location['name'],                       
+                weather['temperature'],                  
+                weather['weather_descriptions'][0],   
                 weather['wind_speed'],
-                location['localtime'],
-                location['utf_offset']
+                weather['humidity'],
+                location['localtime'],                   
+                location['utc_offset']                   
             )
         )
+
         conn.commit()
-        conn.close()
-        print("data successfully inserted")
-    except psycopg2.Error as e :
-        print(f"Error occurred during insertin the data : {e}")
+        print("Data successfully inserted")
+
+    except psycopg2.Error as e:
+        conn.rollback()
+        print(f"Error occurred during inserting the data: {e}")
 
 
-# python weather_data_pipeline/api_request/insert_request.py
+def main() :
+
+    try :
+        data = mock_fetch_data()
+        conn = connect_to_db()
+        create_table(conn)
+        insert_record(conn, data)
+
+    except Exception as e :
+        print(f"An Error occurred during execution : {e}")
+
+    finally :
+        if conn in locals():
+            conn.close()
+            print("Database connection colsed")
