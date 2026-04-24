@@ -101,3 +101,5 @@ def main() :
         if conn in locals():
             conn.close()
             print("Database connection colsed")
+            
+main()
