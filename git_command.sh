@@ -8,6 +8,9 @@
 
 set -e
 
+# python file execute command 
+
+python weather_data_pipeline/api_request/insert_request.py
 ##############################################################################
 
 # 1. INITIAL SETUP (RUN ONLY ONCE)
