@@ -4,6 +4,24 @@
 ########################## DATA ENGINEERING SETUP ############################
 ##############################################################################
 
+# Fetch the Official Docker Compose File
+curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.9.1/docker-compose.yaml'
+
+# Create Required Directories
+mkdir ./dags ./logs ./plugins ./config
+echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
+
+# Initialize Airflow
+docker compose up airflow-init
+
+#  Start Airflow
+docker compose up -d
+
+## info 
+# URL: http://localhost:8080
+# Username: airflow
+# Password: airflow
+
 # Exit immediately if any command fails
 
 set -e
