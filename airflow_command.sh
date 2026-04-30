@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # =============================================================================
 # APACHE AIRFLOW - DOCKER COMMANDS CHEAT SHEET
 # GitHub Codespaces / Development Environment
@@ -8,200 +9,287 @@ echo "========================================="
 echo "  AIRFLOW DOCKER COMMANDS - FULL GUIDE"
 echo "========================================="
 
-# =============================================================================
-# 1. INITIAL SETUP (Pehli baar setup karne ke liye)
-# =============================================================================
+# 1.1. Create folders for Airflow
+mkdir airflow_init
 
-# 1.1. Airflow ke liye folders banane
-# Ye folders create karta hai jahan aapke DAGs, logs, plugins store honge
-mkdir -p ./dags ./logs ./plugins ./config
+# Create Required Directories
+mkdir ./dags ./logs ./plugins ./config
+echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
 
-# 1.2. .env file create karna (User ID set karta hai taaki permission issues na ho)
-# Linux/Mac pe ye command chalegi
-echo -e "AIRFLOW_UID=$(id -u)" > .env
+# Fetch the Official Docker Compose File
+curl -LfO https://airflow.apache.org/docs/apache-airflow/stable/docker-compose.yaml
 
-# 1.3. Airflow database initialize karna
-# Ye sirf pehli baar chalana hai - database tables create karta hai
+# Initialize Airflow
 docker compose up airflow-init
 
-# 1.4. Airflow ko start karna (background mein)
-# -d flag se detached mode mein run hota hai (background)
+#  Start Airflow
+docker compose up -d
+
+## info 
+# URL: http://localhost:8080
+# Username: airflow
+# Password: airflow
+
+# Exit immediately if any command fails
+set -e
+# These folders store your DAGs, logs, plugins, and config files
+
+mkdir -p ./dags ./logs ./plugins ./config
+
+# 1.2. Create .env file (sets User ID to avoid permission issues)
+
+# This command works on Linux/Mac
+
+echo -e "AIRFLOW_UID=$(id -u)" > .env
+
+# 1.3. Initialize Airflow database
+
+# Run this only for the first time - it creates database tables
+
+docker compose up airflow-init
+
+# 1.4. Start Airflow (in background)
+
+# -d flag runs in detached mode (background)
+
 docker compose up -d
 
 # =============================================================================
+
 # 2. DOCKER COMPOSE UP/DOWN (Container Creation & Deletion)
+
 # =============================================================================
 
-# 2.1. START FRESH - Containers create karo aur start karo (background mein)
-# Pehli baar ya docker compose down ke baad use karo
+# 2.1. START FRESH - Create and start containers (in background)
+
+# Use this for first run or after docker compose down
+
 docker compose up -d
 
-# 2.2. START WITH LOGS - Containers create karo aur logs dekho (foreground)
-# Debugging ke liye useful hai - Ctrl+C se stop hoga
+# 2.2. START WITH LOGS - Create containers and view logs (foreground)
+
+# Useful for debugging - press Ctrl+C to stop
+
 docker compose up
 
-# 2.3. STOP & REMOVE EVERYTHING - Containers delete par volumes safe
-# Containers delete honge, lekin data (database, logs) safe rahega
+# 2.3. STOP & REMOVE EVERYTHING - Remove containers but keep volumes safe
+
+# Containers will be removed, but data (database, logs) will remain safe
+
 docker compose down
 
-# 2.4. STOP & REMOVE WITH VOLUMES - Sab kuch delete (clean slate)
-# ⚠️ WARNING: Poora database bhi delete hoga!
+# 2.4. STOP & REMOVE WITH VOLUMES - Delete everything (clean slate)
+
+# WARNING: Entire database will also be deleted!
+
 docker compose down -v
 
 # =============================================================================
-# 3. START/STOP/RESTART (Running Containers ke liye)
+
+# 3. START/STOP/RESTART (For running containers)
+
 # =============================================================================
 
-# 3.1. STOP - Containers ko sirf rokna hai (delete nahi karna)
-# Data safe, containers exist karte hain, bas band hote hain
+# 3.1. STOP - Only stop containers (do not delete)
+
+# Data remains safe, containers still exist but are stopped
+
 docker compose stop
 
-# 3.2. START - Pehle se band containers ko wapas start karna
-# docker compose stop ke baad use karo
+# 3.2. START - Restart previously stopped containers
+
+# Use after docker compose stop
+
 docker compose start
 
-# 3.3. RESTART - Running containers ko restart karna
-# Config changes ke baad useful
+# 3.3. RESTART - Restart running containers
+
+# Useful after config changes
+
 docker compose restart
 
-# 3.4. RESTART SPECIFIC SERVICE - Sirf ek service restart karo
+# 3.4. RESTART SPECIFIC SERVICE - Restart only one service
+
 # Example: scheduler restart, webserver restart, etc.
+
 docker compose restart airflow-webserver
 docker compose restart airflow-scheduler
 
 # =============================================================================
-# 4. BUILDING IMAGES (Custom Images ke liye)
+
+# 4. BUILDING IMAGES (For custom images)
+
 # =============================================================================
 
-# 4.1. Images build karna (agar Dockerfile hai toh)
-# Jab bhi Dockerfile ya requirements.txt change karo
+# 4.1. Build images (if Dockerfile exists)
+
+# Run whenever Dockerfile or requirements.txt changes
+
 docker compose build
 
-# 4.2. Build + Start ek saath
+# 4.2. Build + Start together
+
 docker compose up -d --build
 
 # 4.3. Pull latest images
-# Official images ka latest version lena
+
+# Fetch latest version of official images
+
 docker compose pull
 
 # =============================================================================
-# 5. MONITORING & LOGS (Nazar rakhne ke liye)
+
+# 5. MONITORING & LOGS (For monitoring)
+
 # =============================================================================
 
-# 5.1. Sab containers ki status dekho
+# 5.1. Check status of all containers
+
 docker compose ps
 
-# 5.2. Sab containers ki live logs dekho
-# -f flag continuously logs dikhata hai (Ctrl+C se exit)
+# 5.2. View live logs of all containers
+
+# -f flag shows continuous logs (Ctrl+C to exit)
+
 docker compose logs -f
 
-# 5.3. Specific service ki logs dekho
+# 5.3. View logs of specific service
+
 docker compose logs -f airflow-webserver
 docker compose logs -f airflow-scheduler
 docker compose logs -f postgres
 
-# 5.4. Last 100 lines of logs
+# 5.4. View last 100 lines of logs
+
 docker compose logs --tail=100
 
-# 5.5. Container resource usage dekho
+# 5.5. Check container resource usage
+
 docker stats
 
 # =============================================================================
+
 # 6. EXECUTE COMMANDS INSIDE CONTAINERS
+
 # =============================================================================
 
-# 6.1. Airflow container ke andar jaana (bash shell)
+# 6.1. Enter Airflow container (bash shell)
+
 docker compose exec airflow-webserver bash
 
-# 6.2. Airflow commands chalana container ke andar se
+# 6.2. Run Airflow commands inside container
+
 docker compose exec airflow-scheduler airflow dags list
 docker compose exec airflow-scheduler airflow tasks list example_dag
 docker compose exec airflow-scheduler airflow dags trigger example_dag
 
-# 6.3. Database container mein jaana
+# 6.3. Enter database container
+
 docker compose exec postgres bash
 
 # =============================================================================
+
 # 7. CLEANUP & MAINTENANCE
+
 # =============================================================================
 
-# 7.1. Unused containers, networks, images remove karna
+# 7.1. Remove unused containers, networks, images
+
 docker system prune
 
-# 7.2. Sab kuch remove (containers, images, volumes, networks)
-# ⚠️ WARNING: Poora system clean hoga!
+# 7.2. Remove everything (containers, images, volumes, networks)
+
+# WARNING: Entire system will be cleaned!
+
 docker system prune -a --volumes
 
-# 7.3. Volume list dekho
+# 7.3. List volumes
+
 docker volume ls
 
-# 7.4. Specific volume delete karna
+# 7.4. Delete specific volume
+
 docker volume rm <volume_name>
 
 # =============================================================================
+
 # 8. QUICK RECOVERY COMMANDS
+
 # =============================================================================
 
-# Agar kuch gadbad ho jaye toh:
+# If something goes wrong:
 
-# 8.1. Puri tarah clean karke wapas start
+# 8.1. Fully clean and restart
+
 docker compose down -v
 docker compose build --no-cache
 docker compose up -d
 
-# 8.2. Sirf database reset karna
+# 8.2. Reset only database
+
 docker compose down
 docker volume rm <project_name>_postgres-db-volume
 docker compose up -d
 
 # =============================================================================
+
 # 9. CODESPACES SPECIFIC COMMANDS
+
 # =============================================================================
 
-# 9.1. Codespace resource check
+# 9.1. Check Codespace resources
+
 free -h
 df -h
 docker stats --no-stream
 
-# 9.2. Agar port accessible nahi hai
-# Ports tab mein jaake check karo ya:
+# 9.2. If port is not accessible
+
+# Check in Ports tab or use:
+
 docker compose port airflow-webserver 8080
 
 # =============================================================================
+
 # 10. PRODUCTION-LIKE COMMANDS
+
 # =============================================================================
 
-# 10.1. Specific profile ke saath start (e.g., flower)
+# 10.1. Start with specific profile (e.g., flower)
+
 docker compose --profile flower up -d
 
 # 10.2. Environment variable override
+
 AIRFLOW_IMAGE_NAME=apache/airflow:2.9.0 docker compose up -d
 
 # 10.3. Multiple compose files
+
 docker compose -f docker-compose.yaml -f docker-compose.override.yaml up -d
 
 # =============================================================================
 # DAILY WORKFLOW SUMMARY
 # =============================================================================
+
 echo ""
 echo "========================================="
 echo "  TYPICAL DAILY WORKFLOW"
 echo "========================================="
 echo ""
-echo "MORNING (Kaam Shuru):"
+echo "MORNING (Start work):"
 echo "  docker compose start"
 echo ""
 echo "Add/Edit DAGs in ./dags folder"
-echo "DAGs auto-detect hote hain (every 30 seconds)"
+echo "DAGs are auto-detected (every 30 seconds)"
 echo ""
-echo "EVENING (Kaam Khatam):"
+echo "EVENING (End work):"
 echo "  docker compose stop"
 echo ""
-echo "DEBUGGING (Agar kuch galat ho):"
+echo "DEBUGGING (If something goes wrong):"
 echo "  docker compose logs -f"
 echo "  docker compose restart"
 echo ""
-echo "CLEAN SLATE (Poora reset):"
+echo "CLEAN SLATE (Full reset):"
 echo "  docker compose down -v"
 echo "  docker compose up -d"
 echo ""
