@@ -1,0 +1,42 @@
+[2026-05-01T04:29:01.691+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-05-01T04:29:01.710+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: weather-api-orchestrate.example_task scheduled__2026-05-01T04:28:00+00:00 [queued]>
+[2026-05-01T04:29:01.716+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: weather-api-orchestrate.example_task scheduled__2026-05-01T04:28:00+00:00 [queued]>
+[2026-05-01T04:29:01.716+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2026-05-01T04:29:01.727+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): example_task> on 2026-05-01 04:28:00+00:00
+[2026-05-01T04:29:01.735+0000] {warnings.py:110} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:61: DeprecationWarning: This process (pid=983) is multi-threaded, use of fork() may lead to deadlocks in the child.
+  pid = os.fork()
+
+[2026-05-01T04:29:01.736+0000] {standard_task_runner.py:63} INFO - Started process 985 to run task
+[2026-05-01T04:29:01.736+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'weather-api-orchestrate', 'example_task', 'scheduled__2026-05-01T04:28:00+00:00', '--job-id', '58', '--raw', '--subdir', 'DAGS_FOLDER/orchestrator.py', '--cfg-path', '/tmp/tmp4ia6rcbt']
+[2026-05-01T04:29:01.738+0000] {standard_task_runner.py:91} INFO - Job 58: Subtask example_task
+[2026-05-01T04:29:01.773+0000] {task_command.py:426} INFO - Running <TaskInstance: weather-api-orchestrate.example_task scheduled__2026-05-01T04:28:00+00:00 [running]> on host 074f3b4caaf9
+[2026-05-01T04:29:01.843+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='ritik' AIRFLOW_CTX_DAG_ID='weather-api-orchestrate' AIRFLOW_CTX_TASK_ID='example_task' AIRFLOW_CTX_EXECUTION_DATE='2026-05-01T04:28:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-05-01T04:28:00+00:00'
+[2026-05-01T04:29:01.844+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-05-01T04:29:01.846+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-05-01T04:29:01.846+0000] {taskinstance.py:2905} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 465, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 432, in _execute_callable
+    return execute_callable(context=context, **execute_callable_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/baseoperator.py", line 400, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/operators/python.py", line 235, in execute
+    return_value = self.execute_callable()
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/operators/python.py", line 252, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/dags/orchestrator.py", line 7, in safe_main_callable
+    from api_request.insert_request import main
+  File "/opt/airflow/dags/api_request/insert_request.py", line 2, in <module>
+    from api_request import mock_fetch_data
+ImportError: cannot import name 'mock_fetch_data' from 'api_request' (/opt/airflow/dags/api_request/__init__.py)
+[2026-05-01T04:29:01.853+0000] {taskinstance.py:1206} INFO - Marking task as FAILED. dag_id=weather-api-orchestrate, task_id=example_task, run_id=scheduled__2026-05-01T04:28:00+00:00, execution_date=20260501T042800, start_date=20260501T042901, end_date=20260501T042901
+[2026-05-01T04:29:01.862+0000] {standard_task_runner.py:110} ERROR - Failed to execute job 58 for task example_task (cannot import name 'mock_fetch_data' from 'api_request' (/opt/airflow/dags/api_request/__init__.py); 985)
+[2026-05-01T04:29:01.909+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 1
+[2026-05-01T04:29:01.923+0000] {taskinstance.py:3498} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-01T04:29:01.924+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

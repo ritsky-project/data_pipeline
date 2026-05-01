@@ -12,18 +12,39 @@ echo "========================================="
 # 1.1. Create folders for Airflow
 mkdir airflow_init
 
+# access directory 
+cd airflow_init
+
 # Create Required Directories
 mkdir ./dags ./logs ./plugins ./config
 echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
 
+# install cryptography
+pip install cryptography
+
+# Generate key
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+
+# Update .env
+nano .env
+
+# put generated key 
+FERNET_KEY=your_generated_key_here
+
+# key example 
+FERNET_KEY=qwQHOQGXi0r7xaEpKndqlbvW_xbiGoJaI1_LBYU-hhw=
+
 # Fetch the Official Docker Compose File
 curl -LfO https://airflow.apache.org/docs/apache-airflow/stable/docker-compose.yaml
 
+# check out the services 
+docker-compose config --services
+
 # Initialize Airflow
-docker compose up airflow-init
+docker-compose up airflow_init
 
 #  Start Airflow
-docker compose up -d
+docker-compose up -d
 
 ## info 
 # URL: http://localhost:8080
